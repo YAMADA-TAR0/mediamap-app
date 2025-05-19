@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>作品マップ年表アプリ</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <h1>作品マップ年表アプリ</h1>
+
+  <div id="inputArea">
+    <input type="text" id="titleInput" placeholder="作品タイトル">
+    <select id="yearSelect"></select>
+    <select id="categorySelect">
+      <option value="">大区分（メディア種別）</option>
+      <option value="小説">小説</option>
+      <option value="漫画">漫画</option>
+      <option value="アニメ">アニメ</option>
+      <option value="映画">映画</option>
+      <option value="ドラマ">ドラマ</option>
+    </select>
+    <select id="ratingSelect">
+      <option value="">評価（★1〜5）</option>
+      <option value="1">★1</option>
+      <option value="2">★2</option>
+      <option value="3">★3</option>
+      <option value="4">★4</option>
+      <option value="5">★5</option>
+    </select>
+    <input type="text" id="thumbnailInput" placeholder="サムネイル画像URL">
+    <input type="text" id="memoInput" placeholder="メモ（詳細情報）">
+
+    <div id="tagInputArea">
+      <p>ジャンル（複数選択可）</p>
+      <div id="tagCheckboxes"></div>
+    </div>
+
+    <button onclick="addWork()">追加する</button>
+    <button onclick="clearWorks()">すべてクリア</button>
+  </div>
+
+  <h2>作品検索（TMDb / AniList）</h2>
+  <div>
+    <input type="text" id="titleSearchInput" placeholder="作品タイトルを検索">
+    <button onclick="searchWorks()">候補を検索</button>
+    <div id="searchResults"></div>
+  </div>
+
+  <h2>メディア種別フィルター</h2>
+  <div id="categoryFilterArea"></div>
+
+  <h2>ジャンル（タグ）フィルター</h2>
+  <div>
+    <button onclick="selectAllTags()">すべて選択</button>
+    <button onclick="deselectAllTags()">すべて解除</button>
+  </div>
+  <div id="tagFilterArea"></div>
+
+  <h2>作品マップ（縦軸：評価 / 横軸：年代）</h2>
+  <div id="timeline"></div>
+
+  <h2>タグ別登録数グラフ</h2>
+  <canvas id="tagCountChart" width="600" height="300"></canvas>
+
+  <h2>タグ × 評価の傾向グラフ</h2>
+  <canvas id="tagRatingChart" width="600" height="300"></canvas>
+
+  <h2>データ管理</h2>
+  <button onclick="downloadData()">データをダウンロード</button>
+  <input type="file" id="fileInput" accept=".json" onchange="uploadData()">
+
+  <div id="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">作品タイトル</h2>
+      <p id="modalInfo">ジャンル / 年代</p>
+      <label for="modalRatingSelect">評価（★1〜5）</label>
+      <select id="modalRatingSelect">
+        <option value="1">★1</option>
+        <option value="2">★2</option>
+        <option value="3">★3</option>
+        <option value="4">★4</option>
+        <option value="5">★5</option>
+      </select>
+      <textarea id="memoEditArea"></textarea>
+      <br>
+      <button onclick="saveMemo()">保存</button>
+      <button onclick="deleteWork()">この作品を削除</button>
+      <button onclick="closeModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@panzoom/panzoom"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

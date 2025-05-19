@@ -1,0 +1,146 @@
+body {
+  font-family: sans-serif;
+  background: #f7f7f7;
+  margin: 20px;
+}
+
+h1, h2 {
+  margin-top: 30px;
+}
+
+input, select, button {
+  margin: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+#inputArea {
+  margin-bottom: 20px;
+}
+
+#tagInputArea {
+  margin: 10px 0;
+}
+
+#tagCheckboxes label,
+#categoryFilterArea label,
+#tagFilterArea label {
+  margin-right: 12px;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+#searchResults {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.search-result-item {
+  width: 120px;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.search-result-item:hover {
+  transform: scale(1.05);
+  border-color: #007bff;
+}
+
+.search-result-item img {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.search-result-item span {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+
+#timeline {
+  overflow: auto;
+  width: 100%;
+  height: 1200px;
+  border: 1px solid #aaa;
+  background: #f9f9f9;
+  position: relative;
+}
+
+[data-category="小説"]  { color: #1f77b4; }   /* 青 */
+[data-category="漫画"]  { color: #d62728; }   /* 赤 */
+[data-category="アニメ"] { color: #2ca02c; }  /* 緑 */
+[data-category="映画"]  { color: #ff7f0e; }   /* オレンジ */
+[data-category="ドラマ"]{ color: #9467bd; }   /* 紫 */
+
+table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 10px;
+  vertical-align: top;
+  text-align: center;
+  white-space: nowrap;
+}
+
+td {
+  min-width: 100px;
+  height: 140px;
+}
+
+.thumbnail {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 5px auto;
+}
+
+.work-item {
+  margin-bottom: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+}
+
+#modal button {
+  margin: 5px;
+  padding: 5px 15px;
+}
