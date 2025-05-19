@@ -629,7 +629,7 @@ window.onload = () => {
 };
 
 auth.onAuthStateChanged(user => {
-if (user) {
+  if (user) {
     currentUser = user;
     document.getElementById("userInfo").textContent = `${user.displayName} でログイン中`;
     loadCloudData();
