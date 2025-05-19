@@ -170,6 +170,7 @@ function addWork() {
   works.push({ title, year, category, tags, rating, thumbnail, memo });
   saveWorks();
   renderTimeline();
+  if (currentUser) saveCloudData();  // ←追加！
 }
 
 function clearWorks() {
@@ -397,6 +398,7 @@ function saveMemo() {
     saveWorks();
     renderTimeline();
     closeModal();
+    if (currentUser) saveCloudData();  // ←追加！
   }
 }
 
@@ -408,6 +410,7 @@ function deleteWork() {
       saveWorks();
       renderTimeline();
       closeModal();
+      if (currentUser) saveCloudData();  // ←追加！
     }
   }
 }
