@@ -56,6 +56,8 @@ function loadCloudData() {
       works.length = 0;
       doc.data().works.forEach(w => works.push(w));
       renderTimeline();
+      renderTagCountChart();       // グラフ1再描画（空になる）
+      renderTagRatingChart();      // グラフ2再描画（空になる）
     }
   });
 }
