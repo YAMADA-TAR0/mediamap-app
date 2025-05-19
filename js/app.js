@@ -6,28 +6,11 @@ const firebaseConfig = {
   messagingSenderId: "35065730175",
   appId: "1:35065730175:web:04d4e2814237851451db4a"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 let currentUser = null;
-const works = [];
-const subcategories = [
-  "ミステリー", "サスペンス", "SF", "ファンタジー", "バトル・アクション",
-  "恋愛・ラブコメ", "青春", "ホラー", "ヒューマンドラマ", "歴史・時代劇",
-  "コメディ", "ビジネス・社会派", "ドキュメンタリー・ノンフィクション",
-  "エッセイ・随筆", "異世界転生"
-];
-const categories = ["小説", "漫画", "アニメ", "映画", "ドラマ"];
-const years = [];
-for (let y = 1900; y <= 2025; y += 1) years.push(y);
-
-const selectedTags = new Set(subcategories);
-const selectedCategories = new Set(categories);
-let currentEditingIndex = null;
-let panzoomInstance = null;
-
-// TMDb APIキー（ご自身のキーに差し替えてください）
-const TMDB_API_KEY = "29180f77723266df5d1d65fee230daf9";
 
 function login() {
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -64,6 +47,26 @@ function loadCloudData() {
     }
   });
 }
+
+const works = [];
+const subcategories = [
+  "ミステリー", "サスペンス", "SF", "ファンタジー", "バトル・アクション",
+  "恋愛・ラブコメ", "青春", "ホラー", "ヒューマンドラマ", "歴史・時代劇",
+  "コメディ", "ビジネス・社会派", "ドキュメンタリー・ノンフィクション",
+  "エッセイ・随筆", "異世界転生"
+];
+
+const categories = ["小説", "漫画", "アニメ", "映画", "ドラマ"];
+const years = [];
+for (let y = 1900; y <= 2025; y += 1) years.push(y);
+
+const selectedTags = new Set(subcategories);
+const selectedCategories = new Set(categories);
+let currentEditingIndex = null;
+let panzoomInstance = null;
+
+// TMDb APIキー（ご自身のキーに差し替えてください）
+const TMDB_API_KEY = "29180f77723266df5d1d65fee230daf9";
 
 function populateYearSelect() {
   const yearSelect = document.getElementById("yearSelect");
@@ -134,6 +137,7 @@ function createCategoryFilterArea() {
     area.appendChild(label);
   });
 }
+
 function selectAllTags() {
   subcategories.forEach(tag => selectedTags.add(tag));
   updateTagCheckboxes(true);
@@ -175,9 +179,19 @@ function addWork() {
 
 function clearWorks() {
   if (confirm("すべてのデータを削除しますか？")) {
-    localStorage.removeItem("works");
-    works.length = 0;
-    renderTimeline();
+    if (currentUser) {
+      const uid = currentUser.uid;
+      db.collection("mediaMaps").doc(uid).delete().then(() => {
+        works.length = 0;
+        renderTimeline();
+        alert("クラウド上のデータを削除しました！");
+      });
+    } else {
+      localStorage.removeItem("works");
+      works.length = 0;
+      renderTimeline();
+      alert("ローカル保存データを削除しました！");
+    }
   }
 }
 
@@ -460,6 +474,7 @@ function uploadData() {
   };
   reader.readAsText(file);
 }
+
 function searchWorks() {
   const category = document.getElementById("categorySelect").value;
   const title = document.getElementById("titleSearchInput").value.trim();
