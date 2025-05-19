@@ -297,6 +297,7 @@ function renderTimeline() {
 }
 
 function renderTagCountChart() {
+  console.log("📊 グラフ描画対象:", works);
   const tagCounts = {};
   subcategories.forEach(tag => tagCounts[tag] = 0);
 
