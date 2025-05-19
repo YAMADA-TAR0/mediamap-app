@@ -1,3 +1,15 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyBn30p1y46ru6m2SQHMb9U9eQCCxzla7xo",
+  authDomain: "mediamap-app-2ee92.firebaseapp.com",
+  projectId: "mediamap-app-2ee92",
+  storageBucket: "mediamap-app-2ee92.firebasestorage.app",
+  messagingSenderId: "35065730175",
+  appId: "1:35065730175:web:04d4e2814237851451db4a"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let currentUser = null;
 const works = [];
 const subcategories = [
   "ミステリー", "サスペンス", "SF", "ファンタジー", "バトル・アクション",
@@ -16,6 +28,42 @@ let panzoomInstance = null;
 
 // TMDb APIキー（ご自身のキーに差し替えてください）
 const TMDB_API_KEY = "29180f77723266df5d1d65fee230daf9";
+
+function login() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(result => {
+    currentUser = result.user;
+    document.getElementById("userInfo").textContent = `${currentUser.displayName} でログイン中`;
+    loadCloudData();
+  });
+}
+
+function logout() {
+  auth.signOut().then(() => {
+    currentUser = null;
+    document.getElementById("userInfo").textContent = "";
+    works.length = 0;
+    renderTimeline();
+  });
+}
+
+function saveCloudData() {
+  if (!currentUser) return;
+  const uid = currentUser.uid;
+  db.collection("mediaMaps").doc(uid).set({ works });
+}
+
+function loadCloudData() {
+  if (!currentUser) return;
+  const uid = currentUser.uid;
+  db.collection("mediaMaps").doc(uid).get().then(doc => {
+    if (doc.exists) {
+      works.length = 0;
+      doc.data().works.forEach(w => works.push(w));
+      renderTimeline();
+    }
+  });
+}
 
 function populateYearSelect() {
   const yearSelect = document.getElementById("yearSelect");
