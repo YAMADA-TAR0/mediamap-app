@@ -641,4 +641,3 @@ if (user) {
   }
   updateUIByLogin(); // ← ここでUI切り替え！
 });
-};
