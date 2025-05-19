@@ -36,6 +36,9 @@ function logout() {
     document.getElementById("userInfo").textContent = "";
     works.length = 0;
     renderTimeline();
+    renderTagCountChart();       // グラフ1再描画（空になる）
+    renderTagRatingChart();      // グラフ2再描画（空になる）
+    updateUIByLogin();           // 表示切り替えも忘れずに！
   });
 }
 
