@@ -12,6 +12,15 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 let currentUser = null;
 
+function updateUIByLogin() {
+  const isLoggedIn = !!currentUser;
+  document.getElementById("inputArea").style.display = isLoggedIn ? "block" : "none";
+  document.getElementById("timeline").style.display = isLoggedIn ? "block" : "none";
+  const graph = document.getElementById("graphArea");
+  if (graph) graph.style.display = isLoggedIn ? "block" : "none";
+  document.getElementById("loginPrompt").style.display = isLoggedIn ? "none" : "block";
+}
+
 function login() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).then(result => {
@@ -616,5 +625,20 @@ window.onload = () => {
   loadWorks();
   renderTimeline();
   renderTagCountChart(); // ← タグ別グラフ描画
-  renderTagRatingChart(); // ← 追加  
+  renderTagRatingChart(); // ← 追加 
+};
+
+auth.onAuthStateChanged(user => {
+if (user) {
+    currentUser = user;
+    document.getElementById("userInfo").textContent = `${user.displayName} でログイン中`;
+    loadCloudData();
+  } else {
+    currentUser = null;
+    document.getElementById("userInfo").textContent = "";
+    works.length = 0;
+    renderTimeline();
+  }
+  updateUIByLogin(); // ← ここでUI切り替え！
+});
 };
