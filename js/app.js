@@ -80,7 +80,7 @@ let currentEditingIndex = null;
 let panzoomInstance = null;
 
 // TMDb APIキー（ご自身のキーに差し替えてください）
-const TMDB_API_KEY = "29180f77723266df5d1d65fee230daf9";
+const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3";
 
 function populateYearSelect() {
   const yearSelect = document.getElementById("yearSelect");
