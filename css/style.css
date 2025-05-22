@@ -6,6 +6,14 @@ body {
   padding-right: 100px;
 }
 
+.main-visual-img img{
+  margin: auto;
+  padding-top: 150px;
+  padding-bottom: 150px;
+  width: 25%;
+  max-width: 25%;
+  display: block;
+}
 h1, h2 {
   margin-top: 30px;
 }
