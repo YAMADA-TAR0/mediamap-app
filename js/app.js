@@ -82,12 +82,18 @@ let panzoomInstance = null;
 // TMDb APIキー（ご自身のキーに差し替えてください）
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3";
 
-function toggleInputArea() {
+function toggleInputArea(forceToggle = true) {
   const input = document.getElementById("inputArea");
   const btn = document.getElementById("toggleInputBtn");
-  const isVisible = input.style.display !== "none";
-  input.style.display = isVisible ? "none" : "block";
-  btn.textContent = isVisible ? "＋ 作品を追加する" : "－ 入力フォームを閉じる";
+
+  let isVisible = input.style.display !== "none";
+
+  if (forceToggle) {
+    isVisible = !isVisible;
+    input.style.display = isVisible ? "block" : "none";
+  }
+
+  btn.textContent = isVisible ? "－ 入力フォームを閉じる" : "＋ 作品を追加する";
 }
 
 function populateYearSelect() {
