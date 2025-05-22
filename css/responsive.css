@@ -4,6 +4,15 @@
     padding: 10px;
   }
 
+  .main-visual-img img{
+  margin: auto;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  width: 50%;
+  max-width: 50%;
+  display: block;
+}
+
   #inputArea,
   #tagFilterArea,
   #categoryFilterArea {
