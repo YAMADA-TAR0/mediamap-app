@@ -248,10 +248,17 @@ function renderTimeline() {
 
       group.forEach((work) => {
         const div = document.createElement("div");
-        const correctIndex = works.indexOf(work);
+      
+        // ← ここで works 配列内の同じ作品を探す
+        const correctIndex = works.findIndex(w =>
+          w.title === work.title &&
+          w.year === work.year &&
+          w.category === work.category
+        );
+      
         div.className = "work-item";
         div.onclick = () => openModal(correctIndex);
-
+      
         if (work.thumbnail) {
           const img = document.createElement("img");
           img.src = work.thumbnail;
@@ -259,11 +266,11 @@ function renderTimeline() {
           img.className = "thumbnail";
           div.appendChild(img);
         }
-
+      
         const span = document.createElement("span");
         span.textContent = `[${work.category}] ${work.title}`;
         div.appendChild(span);
-
+      
         td.appendChild(div);
       });
 
