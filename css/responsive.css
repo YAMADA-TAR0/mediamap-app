@@ -4,6 +4,23 @@
     padding: 10px;
   }
 
+@media (max-width: 600px) {
+  #inputArea {
+    display: none;
+  }
+}
+
+#toggleInputBtn {
+  margin-bottom: 10px;
+  padding: 10px 16px;
+  font-size: 16px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+  
   .main-visual-img img{
   margin: auto;
   padding-top: 25px;
