@@ -640,6 +640,7 @@ function selectResult(item) {
 }
 
 window.onload = () => {
+  toggleInputArea(false); // ← 初期表示用（状態変更しないモード）
   populateYearSelect();
   createTagCheckboxes();
   createTagFilterArea();
