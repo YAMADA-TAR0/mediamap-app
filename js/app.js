@@ -246,10 +246,11 @@ function renderTimeline() {
         w.tags.some(tag => selectedTags.has(tag))
       );
 
-      group.forEach((work, index) => {
+      group.forEach((work) => {
         const div = document.createElement("div");
+        const correctIndex = works.indexOf(work);
         div.className = "work-item";
-        div.onclick = () => openModal(index);
+        div.onclick = () => openModal(correctIndex);
 
         if (work.thumbnail) {
           const img = document.createElement("img");
@@ -285,7 +286,7 @@ function renderTimeline() {
   
   panzoomInstance = Panzoom(zoomTarget, {
     maxScale: 5,
-    minScale: 0.01,
+    minScale: 0.1,
     contain: 'outside'
   });
   
