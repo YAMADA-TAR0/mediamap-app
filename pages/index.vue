@@ -8,6 +8,7 @@ import TagRatingChart from '~/components/TagRatingChart.vue'
 import WorkTimeline from '~/components/WorkTimeline.vue'
 import TagFilter from '~/components/TagFilter.vue'
 import CategoryFilter from '~/components/CategoryFilter.vue'
+import MainVisual from '~/components/MainVisual.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth } = $firebase
@@ -137,11 +138,7 @@ onMounted(() => {
     </header>
 
     <main>
-      <section class="main-visual">
-        <div class="main-visual-img">
-          <img src="/img/KV.png" alt="メインビジュアル">
-        </div>
-      </section>
+      <MainVisual />
 
       <div id="loginPrompt" v-if="!isLoggedIn" class="login-prompt">
         <h2>ログインしてください</h2>
@@ -222,19 +219,6 @@ onMounted(() => {
   padding: 20px;
 }
 
-.main-visual {
-  margin: 20px 0;
-}
-
-.main-visual-img img {
-  margin: auto;
-  padding-top: 150px;
-  padding-bottom: 150px;
-  width: 25%;
-  max-width: 25%;
-  display: block;
-}
-
 .login-prompt {
   text-align: center;
   margin-top: 50px;
@@ -276,14 +260,5 @@ button:hover {
 
 input[type="file"] {
   margin: 10px 0;
-}
-
-@media (max-width: 600px) {
-  .main-visual-img img {
-    padding-top: 25px;
-    padding-bottom: 25px;
-    width: 80%;
-    max-width: 80%;
-  }
 }
 </style> 
