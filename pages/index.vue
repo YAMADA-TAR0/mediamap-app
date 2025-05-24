@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useWork } from '~/composables/useWork'
+import { useWorkDataImportExport } from '~/composables/useWorkDataImportExport'
 import WorkInput from '~/components/WorkInput.vue'
 import TagCountChart from '~/components/TagCountChart.vue'
 import TagRatingChart from '~/components/TagRatingChart.vue'
@@ -15,6 +16,7 @@ const { $firebase } = useNuxtApp()
 const { auth } = $firebase
 const { isLoggedIn, currentUser, login, logout, initAuth } = useAuth()
 const { works, createWork, readWorks, updateWork, deleteWork } = useWork($firebase.firestore, currentUser)
+const { downloadData, uploadData } = useWorkDataImportExport(createWork)
 
 // 状態管理
 const showModal = ref(false)
@@ -68,36 +70,6 @@ const handleModalDelete = async () => {
 
   await deleteWork(selectedWork.value.id)
   showModal.value = false
-}
-
-// データインポート/エクスポート
-const downloadData = () => {
-  const data = JSON.stringify(works.value)
-  const blob = new Blob([data], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'works.json'
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-const uploadData = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      try {
-        const data = JSON.parse(e.target.result)
-        for (const work of data) {
-          await createWork(work)
-        }
-      } catch (error) {
-        console.error('データ読み込みエラー:', error)
-      }
-    }
-    reader.readAsText(file)
-  }
 }
 
 // 初期化
