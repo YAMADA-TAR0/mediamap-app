@@ -1,22 +1,19 @@
 {
-  "name": "mediamap-app",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/YAMADA-TAR0/mediamap-app.git"
+  "dependencies": {
+    "nuxt": "^3.17.4",
+    "vue": "^3.5.14",
+    "vue-router": "^4.5.1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/YAMADA-TAR0/mediamap-app/issues"
-  },
-  "homepage": "https://github.com/YAMADA-TAR0/mediamap-app#readme",
-  "description": "",
   "volta": {
     "node": "22.16.0"
   }
