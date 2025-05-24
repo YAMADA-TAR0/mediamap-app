@@ -21,12 +21,12 @@ import TagRatingChart from '~/components/TagRatingChart.vue'
 import WorkTimeline from '~/components/WorkTimeline.vue'
 import TagFilter from '~/components/TagFilter.vue'
 import CategoryFilter from '~/components/CategoryFilter.vue'
+import { useCloudData } from '~/composables/useCloudData'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
-
-// 認証関連の状態管理
 const { isLoggedIn, currentUser, login, logout, initAuth } = useAuth()
+const { saveCloudData, loadCloudData } = useCloudData(firestore, currentUser)
 
 // 状態管理
 const showInputArea = ref(false)
@@ -63,32 +63,18 @@ const years = Array.from({ length: 126 }, (_, i) => 1900 + i)
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3"
 
 // データ管理
-const saveCloudData = async () => {
-  if (!currentUser.value) return
-  try {
-    await setDoc(doc(firestore, 'mediaMaps', currentUser.value.uid), { works: works.value })
-  } catch (error) {
-    console.error('クラウド保存エラー:', error)
-  }
+const handleSaveCloudData = async () => {
+  await saveCloudData(works.value)
 }
 
-const loadCloudData = async () => {
-  if (!currentUser.value) return
-  try {
-    const docRef = doc(firestore, 'mediaMaps', currentUser.value.uid)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      works.value = docSnap.data().works
-    }
-  } catch (error) {
-    console.error('クラウド読み込みエラー:', error)
-  }
+const handleLoadCloudData = async () => {
+  works.value = await loadCloudData()
 }
 
 // 作品追加ハンドラー
 const handleAddWork = (work) => {
   works.value.push(work)
-  saveCloudData()
+  handleSaveCloudData()
 }
 
 // モーダル関連
@@ -112,7 +98,7 @@ const saveMemo = async () => {
   if (workIndex !== -1) {
     works.value[workIndex].memo = memoEditArea.value
     works.value[workIndex].rating = parseInt(modalRatingSelect.value)
-    await saveCloudData()
+    await handleSaveCloudData()
   }
 
   showModal.value = false
@@ -122,7 +108,7 @@ const deleteWork = async () => {
   if (!selectedWorkId.value) return
 
   works.value = works.value.filter(w => w.id !== selectedWorkId.value)
-  await saveCloudData()
+  await handleSaveCloudData()
   showModal.value = false
 }
 
@@ -159,7 +145,7 @@ onMounted(() => {
   // 認証状態の監視
   initAuth(auth, async (user) => {
     if (user) {
-      await loadCloudData()
+      await handleLoadCloudData()
     } else {
       works.value = []
     }
@@ -227,7 +213,7 @@ onMounted(() => {
       <div id="loginPrompt" v-if="!isLoggedIn" class="login-prompt">
         <h2>ログインしてください</h2>
         <p>このアプリを利用するにはGoogleアカウントでのログインが必要です。</p>
-        <button @click="() => login(auth, loadCloudData)">Googleでログイン</button>
+        <button @click="() => login(auth, handleLoadCloudData)">Googleでログイン</button>
       </div>
 
       <div id="userArea" v-if="isLoggedIn">
