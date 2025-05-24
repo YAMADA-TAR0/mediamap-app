@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
-import { useCloudData } from '~/composables/useCloudData'
+import { useWork } from '~/composables/useWork'
 import WorkInput from '~/components/WorkInput.vue'
 import TagCountChart from '~/components/TagCountChart.vue'
 import TagRatingChart from '~/components/TagRatingChart.vue'
@@ -13,10 +13,9 @@ import MainVisual from '~/components/MainVisual.vue'
 const { $firebase } = useNuxtApp()
 const { auth } = $firebase
 const { isLoggedIn, currentUser, login, logout, initAuth } = useAuth()
-const { saveCloudData, loadCloudData } = useCloudData($firebase.firestore, currentUser)
+const { works, createWork, readWorks, updateWork, deleteWork } = useWork($firebase.firestore, currentUser)
 
 // 状態管理
-const works = ref([])
 const showModal = ref(false)
 const modalTitle = ref('')
 const modalInfo = ref('')
@@ -41,18 +40,13 @@ const years = Array.from({ length: 126 }, (_, i) => 1900 + i)
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3"
 
 // データ管理
-const handleSaveCloudData = async () => {
-  await saveCloudData(works.value)
-}
-
 const handleLoadCloudData = async () => {
   works.value = await loadCloudData()
 }
 
 // 作品追加ハンドラー
-const handleAddWork = (work) => {
-  works.value.push(work)
-  handleSaveCloudData()
+const handleAddWork = async (work) => {
+  await createWork(work)
 }
 
 // モーダル関連
@@ -72,21 +66,18 @@ const closeModal = () => {
 const saveMemo = async () => {
   if (!selectedWorkId.value) return
 
-  const workIndex = works.value.findIndex(w => w.id === selectedWorkId.value)
-  if (workIndex !== -1) {
-    works.value[workIndex].memo = memoEditArea.value
-    works.value[workIndex].rating = parseInt(modalRatingSelect.value)
-    await handleSaveCloudData()
-  }
+  await updateWork(selectedWorkId.value, {
+    memo: memoEditArea.value,
+    rating: parseInt(modalRatingSelect.value)
+  })
 
   showModal.value = false
 }
 
-const deleteWork = async () => {
+const handleDeleteWork = async () => {
   if (!selectedWorkId.value) return
 
-  works.value = works.value.filter(w => w.id !== selectedWorkId.value)
-  await handleSaveCloudData()
+  await deleteWork(selectedWorkId.value)
   showModal.value = false
 }
 
@@ -106,10 +97,12 @@ const uploadData = (event) => {
   const file = event.target.files[0]
   if (file) {
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const data = JSON.parse(e.target.result)
-        works.value = data
+        for (const work of data) {
+          await createWork(work)
+        }
       } catch (error) {
         console.error('データ読み込みエラー:', error)
       }
@@ -123,7 +116,7 @@ onMounted(() => {
   // 認証状態の監視
   initAuth(auth, async (user) => {
     if (user) {
-      await handleLoadCloudData()
+      await readWorks()
     } else {
       works.value = []
     }
@@ -204,7 +197,7 @@ onMounted(() => {
           <textarea v-model="memoEditArea"></textarea>
           <br>
           <button @click="saveMemo">保存</button>
-          <button @click="deleteWork">この作品を削除</button>
+          <button @click="handleDeleteWork">この作品を削除</button>
           <button @click="closeModal">キャンセル</button>
         </div>
       </div>
