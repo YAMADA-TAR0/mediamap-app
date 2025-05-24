@@ -644,7 +644,7 @@ onMounted(() => {
           renderTagCountChart()
           renderTagRatingChart()
         })">ログアウト</button>
-        <p id="userInfo">{{ currentUser?.email }}</p>
+        <p id="userInfo">{{ currentUser?.displayName }} でログイン中</p>
       </div>
 
       <h2>作品情報を入力</h2>
