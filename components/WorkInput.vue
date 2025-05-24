@@ -138,28 +138,28 @@ const searchWorks = async () => {
         thumbnail: movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '',
         tags: movie.genre_ids.map(id => {
           const genres = {
-            28: 'アクション',
-            12: 'アドベンチャー',
+            28: 'バトル・アクション',
+            12: 'ファンタジー',
             16: 'アニメ',
             35: 'コメディ',
-            80: '犯罪',
-            99: 'ドキュメンタリー',
-            18: 'ドラマ',
-            10751: 'ファミリー',
+            80: 'サスペンス',
+            99: 'ドキュメンタリー・ノンフィクション',
+            18: 'ヒューマンドラマ',
+            10751: 'ファンタジー',
             14: 'ファンタジー',
-            36: '歴史',
+            36: '歴史・時代劇',
             27: 'ホラー',
-            10402: '音楽',
+            10402: 'ヒューマンドラマ',
             9648: 'ミステリー',
-            10749: 'ロマンス',
+            10749: '恋愛・ラブコメ',
             878: 'SF',
-            10770: 'TV映画',
-            53: 'スリラー',
-            10752: '戦争',
-            37: '西部劇'
+            10770: 'ヒューマンドラマ',
+            53: 'サスペンス',
+            10752: 'ヒューマンドラマ',
+            37: '歴史・時代劇'
           }
           return genres[id] || 'その他'
-        })
+        }).filter(tag => props.subcategories.includes(tag))
       })
     })
 
@@ -172,24 +172,24 @@ const searchWorks = async () => {
         thumbnail: tv.poster_path ? `https://image.tmdb.org/t/p/w500${tv.poster_path}` : '',
         tags: tv.genre_ids.map(id => {
           const genres = {
-            10759: 'アクション＆アドベンチャー',
+            10759: 'バトル・アクション',
             16: 'アニメ',
             35: 'コメディ',
-            80: '犯罪',
-            99: 'ドキュメンタリー',
-            18: 'ドラマ',
-            10751: 'ファミリー',
-            10762: 'キッズ',
+            80: 'サスペンス',
+            99: 'ドキュメンタリー・ノンフィクション',
+            18: 'ヒューマンドラマ',
+            10751: 'ファンタジー',
+            10762: '青春',
             9648: 'ミステリー',
-            10763: 'ニュース',
-            10764: 'リアリティ',
-            10765: 'SF＆ファンタジー',
-            10766: 'ソープ',
-            10767: 'トーク',
-            10768: '戦争＆政治'
+            10763: 'ドキュメンタリー・ノンフィクション',
+            10764: 'ドキュメンタリー・ノンフィクション',
+            10765: 'SF',
+            10766: 'ヒューマンドラマ',
+            10767: 'ドキュメンタリー・ノンフィクション',
+            10768: 'ヒューマンドラマ'
           }
           return genres[id] || 'その他'
-        })
+        }).filter(tag => props.subcategories.includes(tag))
       })
     })
 
@@ -200,7 +200,52 @@ const searchWorks = async () => {
         year: anime.startDate.year || '不明',
         category: 'アニメ',
         thumbnail: anime.coverImage.large,
-        tags: anime.genres
+        tags: anime.genres.map(genre => {
+          const genreMap = {
+            'Action': 'バトル・アクション',
+            'Adventure': 'ファンタジー',
+            'Comedy': 'コメディ',
+            'Drama': 'ヒューマンドラマ',
+            'Fantasy': 'ファンタジー',
+            'Horror': 'ホラー',
+            'Mystery': 'ミステリー',
+            'Romance': '恋愛・ラブコメ',
+            'Sci-Fi': 'SF',
+            'Slice of Life': '青春',
+            'Supernatural': 'ファンタジー',
+            'Thriller': 'サスペンス',
+            'Psychological': 'サスペンス',
+            'Historical': '歴史・時代劇',
+            'Sports': '青春',
+            'Music': 'ヒューマンドラマ',
+            'School': '青春',
+            'Ecchi': 'コメディ',
+            'Harem': '恋愛・ラブコメ',
+            'Mecha': 'SF',
+            'Parody': 'コメディ',
+            'Samurai': '歴史・時代劇',
+            'Shoujo': '恋愛・ラブコメ',
+            'Shounen': 'バトル・アクション',
+            'Super Power': 'ファンタジー',
+            'Vampire': 'ホラー',
+            'Yaoi': '恋愛・ラブコメ',
+            'Yuri': '恋愛・ラブコメ',
+            'Martial Arts': 'バトル・アクション',
+            'Military': 'ヒューマンドラマ',
+            'Police': 'サスペンス',
+            'Psychological': 'サスペンス',
+            'Seinen': 'ヒューマンドラマ',
+            'Shoujo Ai': '恋愛・ラブコメ',
+            'Shounen Ai': '恋愛・ラブコメ',
+            'Space': 'SF',
+            'Sports': '青春',
+            'Super Power': 'ファンタジー',
+            'Vampire': 'ホラー',
+            'Yaoi': '恋愛・ラブコメ',
+            'Yuri': '恋愛・ラブコメ'
+          }
+          return genreMap[genre] || 'その他'
+        }).filter(tag => props.subcategories.includes(tag))
       })
     })
 
