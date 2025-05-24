@@ -1,12 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signOut,
-  onAuthStateChanged 
-} from 'firebase/auth'
-import { 
   collection, 
   addDoc, 
   getDocs, 
@@ -20,13 +14,15 @@ import {
 } from 'firebase/firestore'
 import Chart from 'chart.js/auto'
 import panzoom from '@panzoom/panzoom'
+import { useAuth } from '~/composables/useAuth'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
 
+// 認証関連の状態管理
+const { isLoggedIn, currentUser, login, logout, initAuth } = useAuth()
+
 // 状態管理
-const isLoggedIn = ref(false)
-const currentUser = ref(null)
 const showInputArea = ref(false)
 const works = ref([])
 const titleInput = ref('')
@@ -61,33 +57,6 @@ const years = Array.from({ length: 126 }, (_, i) => 1900 + i)
 
 // TMDb APIキー
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3"
-
-// 認証関連
-const login = async () => {
-  try {
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup(auth, provider)
-    currentUser.value = result.user
-    isLoggedIn.value = true
-    await loadCloudData()
-  } catch (error) {
-    console.error('ログインエラー:', error)
-  }
-}
-
-const logout = async () => {
-  try {
-    await signOut(auth)
-    currentUser.value = null
-    isLoggedIn.value = false
-    works.value = []
-    renderTimeline()
-    renderTagCountChart()
-    renderTagRatingChart()
-  } catch (error) {
-    console.error('ログアウトエラー:', error)
-  }
-}
 
 // データ管理
 const saveCloudData = async () => {
@@ -574,11 +543,14 @@ const selectSearchResult = (title, year, category, thumbnail, tags) => {
 // 初期化
 onMounted(() => {
   // 認証状態の監視
-  onAuthStateChanged(auth, (user) => {
-    currentUser.value = user
-    isLoggedIn.value = !!user
+  initAuth(auth, async (user) => {
     if (user) {
-      loadCloudData()
+      await loadCloudData()
+    } else {
+      works.value = []
+      renderTimeline()
+      renderTagCountChart()
+      renderTagRatingChart()
     }
   })
 
@@ -662,12 +634,16 @@ onMounted(() => {
       <div id="loginPrompt" v-if="!isLoggedIn" class="login-prompt">
         <h2>ログインしてください</h2>
         <p>このアプリを利用するにはGoogleアカウントでのログインが必要です。</p>
-        <button @click="login">Googleでログイン</button>
+        <button @click="() => login(auth, loadCloudData)">Googleでログイン</button>
       </div>
 
       <div id="userArea" v-if="isLoggedIn">
-        <button @click="login">Googleでログイン</button>
-        <button @click="logout">ログアウト</button>
+        <button @click="() => logout(auth, () => {
+          works.value = []
+          renderTimeline()
+          renderTagCountChart()
+          renderTagRatingChart()
+        })">ログアウト</button>
         <p id="userInfo">{{ currentUser?.email }}</p>
       </div>
 
