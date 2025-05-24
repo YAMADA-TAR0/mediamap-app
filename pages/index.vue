@@ -1,44 +1,21 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { 
-  collection, 
-  addDoc, 
-  getDocs, 
-  deleteDoc, 
-  doc, 
-  updateDoc,
-  query,
-  where,
-  setDoc,
-  getDoc
-} from 'firebase/firestore'
-import Chart from 'chart.js/auto'
-import panzoom from '@panzoom/panzoom'
 import { useAuth } from '~/composables/useAuth'
+import { useCloudData } from '~/composables/useCloudData'
 import WorkInput from '~/components/WorkInput.vue'
 import TagCountChart from '~/components/TagCountChart.vue'
 import TagRatingChart from '~/components/TagRatingChart.vue'
 import WorkTimeline from '~/components/WorkTimeline.vue'
 import TagFilter from '~/components/TagFilter.vue'
 import CategoryFilter from '~/components/CategoryFilter.vue'
-import { useCloudData } from '~/composables/useCloudData'
 
 const { $firebase } = useNuxtApp()
-const { auth, firestore } = $firebase
+const { auth } = $firebase
 const { isLoggedIn, currentUser, login, logout, initAuth } = useAuth()
-const { saveCloudData, loadCloudData } = useCloudData(firestore, currentUser)
+const { saveCloudData, loadCloudData } = useCloudData($firebase.firestore, currentUser)
 
 // 状態管理
-const showInputArea = ref(false)
 const works = ref([])
-const titleInput = ref('')
-const yearSelect = ref('')
-const categorySelect = ref('')
-const ratingSelect = ref('')
-const thumbnailInput = ref('')
-const memoInput = ref('')
-const titleSearchInput = ref('')
-const searchResults = ref([])
 const showModal = ref(false)
 const modalTitle = ref('')
 const modalInfo = ref('')
@@ -150,50 +127,6 @@ onMounted(() => {
       works.value = []
     }
   })
-
-  // タグチェックボックスの生成
-  const tagCheckboxes = document.getElementById('tagCheckboxes')
-  if (tagCheckboxes) {
-    subcategories.forEach(tag => {
-      const label = document.createElement('label')
-      const cb = document.createElement('input')
-      cb.type = 'checkbox'
-      cb.value = tag
-      cb.checked = true
-      cb.onchange = () => {
-        if (cb.checked) {
-          selectedTags.value.add(tag)
-        } else {
-          selectedTags.value.delete(tag)
-        }
-      }
-      label.appendChild(cb)
-      label.appendChild(document.createTextNode(tag))
-      tagCheckboxes.appendChild(label)
-    })
-  }
-
-  // カテゴリーフィルターの生成
-  const categoryFilterArea = document.getElementById('categoryFilterArea')
-  if (categoryFilterArea) {
-    categories.forEach(cat => {
-      const label = document.createElement('label')
-      const cb = document.createElement('input')
-      cb.type = 'checkbox'
-      cb.value = cat
-      cb.checked = true
-      cb.onchange = () => {
-        if (cb.checked) {
-          selectedCategories.value.add(cat)
-        } else {
-          selectedCategories.value.delete(cat)
-        }
-      }
-      label.appendChild(cb)
-      label.appendChild(document.createTextNode(cat))
-      categoryFilterArea.appendChild(label)
-    })
-  }
 })
 </script>
 
@@ -283,14 +216,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-body {
-  font-family: sans-serif;
-  background: #f7f7f7;
-  margin: 20px;
-  padding-left: 100px;
-  padding-right: 100px;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -313,20 +238,6 @@ body {
 .login-prompt {
   text-align: center;
   margin-top: 50px;
-}
-
-#inputArea {
-  margin: 20px 0;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-#inputArea input,
-#inputArea select {
-  margin: 10px 0;
-  padding: 8px;
-  width: 100%;
 }
 
 #modal {
@@ -367,162 +278,12 @@ input[type="file"] {
   margin: 10px 0;
 }
 
-/* タイムラインのスタイル */
-#timeline {
-  overflow: auto;
-  width: 100%;
-  height: 1200px;
-  border: 1px solid #aaa;
-  background: #f9f9f9;
-  position: relative;
-  margin: 20px 0;
-}
-
-#timeline table {
-  border-collapse: collapse;
-  width: max-content;
-  min-width: 100%;
-}
-
-#timeline th,
-#timeline td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
-  min-width: 100px;
-  height: 140px;
-  vertical-align: top;
-  white-space: nowrap;
-}
-
-#timeline th {
-  background-color: #f5f5f5;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.work-item {
-  cursor: pointer;
-  padding: 4px;
-  margin: 2px;
-  background-color: #e8f5e9;
-  border-radius: 4px;
-  font-size: 12px;
-  margin-bottom: 8px;
-}
-
-.work-item:hover {
-  background-color: #c8e6c9;
-}
-
-/* カテゴリー別の色分け */
-[data-category="小説"] { color: #1f77b4; }
-[data-category="漫画"] { color: #d62728; }
-[data-category="アニメ"] { color: #2ca02c; }
-[data-category="映画"] { color: #ff7f0e; }
-[data-category="ドラマ"] { color: #9467bd; }
-
-/* タグチェックボックスのスタイル */
-#tagCheckboxes,
-#tagFilterArea {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-#tagCheckboxes label,
-#tagFilterArea label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  margin-right: 12px;
-  display: inline-block;
-  margin-bottom: 5px;
-}
-
-.search-result-item {
-  display: flex;
-  gap: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  margin: 10px 0;
-  border-radius: 4px;
-  width: 120px;
-  background: #fff;
-  cursor: pointer;
-  text-align: center;
-  transition: transform 0.2s;
-}
-
-.search-result-item:hover {
-  transform: scale(1.05);
-  border-color: #007bff;
-}
-
-.search-result-item img {
-  width: 100px;
-  height: 150px;
-  object-fit: cover;
-}
-
-.search-result-item h3 {
-  margin: 0 0 10px 0;
-}
-
-.search-result-item p {
-  margin: 5px 0;
-  font-size: 12px;
-}
-
-/* レスポンシブ対応 */
 @media (max-width: 600px) {
-  body {
-    font-size: 14px;
-    padding: 10px;
-  }
-
   .main-visual-img img {
     padding-top: 25px;
     padding-bottom: 25px;
     width: 80%;
     max-width: 80%;
-  }
-
-  #inputArea,
-  #tagFilterArea,
-  #categoryFilterArea {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  #inputArea input,
-  #inputArea select,
-  #inputArea button {
-    width: 100%;
-    font-size: 16px;
-  }
-
-  .work-item {
-    max-width: 100%;
-    text-align: center;
-  }
-
-  #timeline {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #timeline table {
-    min-width: 800px;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: auto !important;
   }
 }
 </style> 
