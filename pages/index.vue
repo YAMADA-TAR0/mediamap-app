@@ -507,17 +507,6 @@ onMounted(() => {
     }
   })
 
-  // 年選択肢の生成
-  const yearSelect = document.getElementById('yearSelect')
-  if (yearSelect) {
-    years.forEach(year => {
-      const option = document.createElement('option')
-      option.value = year
-      option.textContent = `${year}年`
-      yearSelect.appendChild(option)
-    })
-  }
-
   // タグチェックボックスの生成
   const tagCheckboxes = document.getElementById('tagCheckboxes')
   if (tagCheckboxes) {
