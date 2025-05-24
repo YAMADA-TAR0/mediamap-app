@@ -16,6 +16,7 @@ import Chart from 'chart.js/auto'
 import panzoom from '@panzoom/panzoom'
 import { useAuth } from '~/composables/useAuth'
 import WorkInput from '~/components/WorkInput.vue'
+import TagCountChart from '~/components/TagCountChart.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
@@ -42,7 +43,6 @@ const memoEditArea = ref('')
 const selectedWorkId = ref(null)
 const selectedTags = ref(new Set())
 const selectedCategories = ref(new Set())
-const tagCountChart = ref(null)
 const tagRatingChart = ref(null)
 
 // 定数
@@ -77,7 +77,6 @@ const loadCloudData = async () => {
     if (docSnap.exists()) {
       works.value = docSnap.data().works
       renderTimeline()
-      renderTagCountChart()
       renderTagRatingChart()
     }
   } catch (error) {
@@ -90,7 +89,6 @@ const handleAddWork = (work) => {
   works.value.push(work)
   saveCloudData()
   renderTimeline()
-  renderTagCountChart()
   renderTagRatingChart()
 }
 
@@ -159,41 +157,6 @@ const renderTimeline = () => {
 }
 
 // グラフ表示
-const renderTagCountChart = () => {
-  const ctx = document.getElementById('tagCountChart')
-  if (!ctx) return
-
-  // 既存のグラフを破棄
-  if (tagCountChart.value) {
-    tagCountChart.value.destroy()
-  }
-
-  const tagCounts = {}
-  works.value.forEach(work => {
-    work.tags.forEach(tag => {
-      tagCounts[tag] = (tagCounts[tag] || 0) + 1
-    })
-  })
-
-  tagCountChart.value = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: Object.keys(tagCounts),
-      datasets: [{
-        label: 'タグ別登録数',
-        data: Object.values(tagCounts),
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  })
-}
-
 const renderTagRatingChart = () => {
   const ctx = document.getElementById('tagRatingChart')
   if (!ctx) return
@@ -260,7 +223,6 @@ const saveMemo = async () => {
     works.value[workIndex].rating = parseInt(modalRatingSelect.value)
     await saveCloudData()
     renderTimeline()
-    renderTagCountChart()
     renderTagRatingChart()
   }
 
@@ -273,7 +235,6 @@ const deleteWork = async () => {
   works.value = works.value.filter(w => w.id !== selectedWorkId.value)
   await saveCloudData()
   renderTimeline()
-  renderTagCountChart()
   renderTagRatingChart()
   showModal.value = false
 }
@@ -310,7 +271,6 @@ const uploadData = (event) => {
         const data = JSON.parse(e.target.result)
         works.value = data
         renderTimeline()
-        renderTagCountChart()
         renderTagRatingChart()
       } catch (error) {
         console.error('データ読み込みエラー:', error)
@@ -329,7 +289,6 @@ onMounted(() => {
     } else {
       works.value = []
       renderTimeline()
-      renderTagCountChart()
       renderTagRatingChart()
     }
   })
@@ -382,7 +341,6 @@ onMounted(() => {
 
   // 初期表示
   renderTimeline()
-  renderTagCountChart()
   renderTagRatingChart()
 })
 </script>
@@ -410,7 +368,6 @@ onMounted(() => {
         <button @click="() => logout(auth, () => {
           works.value = []
           renderTimeline()
-          renderTagCountChart()
           renderTagRatingChart()
         })">ログアウト</button>
         <p id="userInfo">{{ currentUser?.displayName }} でログイン中</p>
@@ -437,7 +394,7 @@ onMounted(() => {
       <div id="timeline"></div>
 
       <h2>タグ別登録数グラフ</h2>
-      <canvas id="tagCountChart" width="600" height="300"></canvas>
+      <TagCountChart :works="works" />
 
       <h2>タグ × 評価の傾向グラフ</h2>
       <canvas id="tagRatingChart" width="600" height="300"></canvas>
