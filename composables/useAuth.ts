@@ -7,14 +7,17 @@ import {
 } from 'firebase/auth'
 import type { Auth, User } from 'firebase/auth'
 
+// コールバック関数の型定義
 type OnLoginSuccess = (user: User) => Promise<void> | void
 type OnLogoutSuccess = () => Promise<void> | void
 type OnAuthStateChange = (user: User | null) => Promise<void> | void
 
 export const useAuth = () => {
+  // ユーザーのログイン状態と情報を管理する変数
   const isLoggedIn = ref<boolean>(false)
   const currentUser = ref<User | null>(null)
 
+  // Googleアカウントでのログイン処理
   const login = async (auth: Auth, onLoginSuccess?: OnLoginSuccess): Promise<User> => {
     try {
       const provider = new GoogleAuthProvider()
@@ -31,6 +34,7 @@ export const useAuth = () => {
     }
   }
 
+  // ログアウト処理
   const logout = async (auth: Auth, onLogoutSuccess?: OnLogoutSuccess): Promise<void> => {
     try {
       await signOut(auth)
@@ -45,6 +49,7 @@ export const useAuth = () => {
     }
   }
 
+  // 認証状態の監視と初期化
   const initAuth = (auth: Auth, onAuthStateChange?: OnAuthStateChange): void => {
     onAuthStateChanged(auth, async (user) => {
       currentUser.value = user

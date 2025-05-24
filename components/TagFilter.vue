@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 
+// コンポーネントの入力値（props）の定義
 const props = defineProps({
   subcategories: {
     type: Array,
@@ -14,7 +15,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:selectedTags'])
 
-// デフォルトですべてのタグを選択
+// コンポーネントがマウントされた時に、デフォルトですべてのタグを選択状態にする
 onMounted(() => {
   if (props.selectedTags.size === 0) {
     const newSelectedTags = new Set(props.subcategories)
@@ -22,6 +23,7 @@ onMounted(() => {
   }
 })
 
+// タグの選択状態を管理する関数
 const selectAllTags = () => {
   const newSelectedTags = new Set(props.subcategories)
   emit('update:selectedTags', newSelectedTags)
@@ -43,12 +45,15 @@ const handleTagChange = (tag, checked) => {
 </script>
 
 <template>
+  <!-- タグフィルターのUI -->
   <div class="tag-filter">
     <h2>ジャンル（タグ）フィルター</h2>
+    <!-- タグの一括選択・解除ボタン -->
     <div class="tag-controls">
       <button @click="selectAllTags" class="control-button">すべて選択</button>
       <button @click="deselectAllTags" class="control-button">すべて解除</button>
     </div>
+    <!-- タグのチェックボックスリスト -->
     <div class="tag-list">
       <label v-for="tag in subcategories" :key="tag" class="tag-item">
         <input
@@ -65,6 +70,7 @@ const handleTagChange = (tag, checked) => {
 </template>
 
 <style scoped>
+/* タグフィルターの基本スタイル */
 .tag-filter {
   margin: 20px 0;
   padding: 20px;
@@ -73,6 +79,7 @@ const handleTagChange = (tag, checked) => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* タグコントロールボタンのスタイル */
 .tag-controls {
   margin-bottom: 15px;
   display: flex;
@@ -94,6 +101,7 @@ const handleTagChange = (tag, checked) => {
   background: #45a049;
 }
 
+/* タグリストのレイアウト */
 .tag-list {
   display: flex;
   flex-wrap: wrap;
@@ -101,6 +109,7 @@ const handleTagChange = (tag, checked) => {
   padding: 10px 0;
 }
 
+/* 個別のタグアイテムのスタイル */
 .tag-item {
   display: flex;
   align-items: center;
@@ -116,18 +125,7 @@ const handleTagChange = (tag, checked) => {
   background: #e8e8e8;
 }
 
-.tag-checkbox {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.tag-label {
-  font-size: 14px;
-  color: #333;
-}
-
-/* チェックボックスのカスタマイズ */
+/* カスタマイズされたチェックボックスのスタイル */
 .tag-checkbox {
   appearance: none;
   -webkit-appearance: none;
@@ -159,7 +157,7 @@ const handleTagChange = (tag, checked) => {
   border-color: #45a049;
 }
 
-/* レスポンシブ対応 */
+/* モバイル対応のスタイル */
 @media (max-width: 600px) {
   .tag-filter {
     padding: 15px;
