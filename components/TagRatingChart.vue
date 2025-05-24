@@ -20,36 +20,47 @@ const renderChart = () => {
     chartInstance.value.destroy()
   }
 
-  const tagRatings = {}
+  const tagRatingMap = {}
   props.works.forEach(work => {
+    if (!Array.isArray(work.tags) || isNaN(work.rating) || work.rating < 1 || work.rating > 5) {
+      return
+    }
+
     work.tags.forEach(tag => {
-      if (!tagRatings[tag]) {
-        tagRatings[tag] = { sum: 0, count: 0 }
+      if (!tagRatingMap[tag]) {
+        tagRatingMap[tag] = [0, 0, 0, 0, 0] // ★1〜5カウント用
       }
-      tagRatings[tag].sum += work.rating
-      tagRatings[tag].count++
+      tagRatingMap[tag][work.rating - 1]++
     })
   })
 
-  const averages = {}
-  Object.keys(tagRatings).forEach(tag => {
-    averages[tag] = tagRatings[tag].sum / tagRatings[tag].count
-  })
+  const labels = Object.keys(tagRatingMap)
+  const datasets = []
+
+  for (let r = 5; r >= 1; r--) {
+    datasets.push({
+      label: `★${r}`,
+      data: labels.map(tag => tagRatingMap[tag][r - 1]),
+      backgroundColor: `rgba(${50 + r * 30}, ${100 + r * 15}, ${200 - r * 20}, 0.8)`,
+      stack: 'stack1'
+    })
+  }
 
   chartInstance.value = new Chart(chartCanvas.value, {
-    type: 'line',
+    type: 'bar',
     data: {
-      labels: Object.keys(averages),
-      datasets: [{
-        label: 'タグ別平均評価',
-        data: Object.values(averages),
-        borderColor: 'rgba(255, 99, 132, 1)',
-        tension: 0.1
-      }]
+      labels,
+      datasets
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, beginAtZero: true }
+      },
+      plugins: {
+        tooltip: { mode: 'index', intersect: false }
+      }
     }
   })
 }
