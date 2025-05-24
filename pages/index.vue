@@ -15,6 +15,7 @@ import {
 import Chart from 'chart.js/auto'
 import panzoom from '@panzoom/panzoom'
 import { useAuth } from '~/composables/useAuth'
+import WorkInput from '~/components/WorkInput.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
@@ -84,61 +85,13 @@ const loadCloudData = async () => {
   }
 }
 
-// 作品管理
-const addWork = () => {
-  if (!titleInput.value || !yearSelect.value || !categorySelect.value || selectedTags.value.size === 0 || !ratingSelect.value) {
-    alert("すべての項目を入力してください（タグは1つ以上）")
-    return
-  }
-
-  const work = {
-    title: titleInput.value,
-    year: yearSelect.value,
-    category: categorySelect.value,
-    tags: Array.from(selectedTags.value),
-    rating: parseInt(ratingSelect.value),
-    thumbnail: thumbnailInput.value,
-    memo: memoInput.value
-  }
-
+// 作品追加ハンドラー
+const handleAddWork = (work) => {
   works.value.push(work)
   saveCloudData()
   renderTimeline()
   renderTagCountChart()
   renderTagRatingChart()
-
-  // 入力フォームをクリア
-  titleInput.value = ''
-  yearSelect.value = ''
-  categorySelect.value = ''
-  ratingSelect.value = ''
-  thumbnailInput.value = ''
-  memoInput.value = ''
-  selectedTags.value.clear()
-}
-
-const clearWorks = async () => {
-  if (!confirm("すべてのデータを削除しますか？")) return
-
-  if (currentUser.value) {
-    try {
-      await deleteDoc(doc(firestore, 'mediaMaps', currentUser.value.uid))
-      works.value = []
-      renderTimeline()
-      renderTagCountChart()
-      renderTagRatingChart()
-      alert("クラウド上のデータを削除しました！")
-    } catch (error) {
-      console.error('データ削除エラー:', error)
-    }
-  } else {
-    localStorage.removeItem("works")
-    works.value = []
-    renderTimeline()
-    renderTagCountChart()
-    renderTagRatingChart()
-    alert("ローカル保存データを削除しました！")
-  }
 }
 
 // タイムライン表示
@@ -647,47 +600,12 @@ onMounted(() => {
         <p id="userInfo">{{ currentUser?.displayName }} でログイン中</p>
       </div>
 
-      <h2>作品情報を入力</h2>
-      <button id="toggleInputBtn" @click="toggleInputArea">
-        {{ showInputArea ? '−' : '＋' }} 作品を追加する
-      </button>
-      <div id="inputArea" v-if="showInputArea">
-        <input v-model="titleInput" type="text" placeholder="作品タイトル">
-        <select v-model="yearSelect"></select>
-        <select v-model="categorySelect">
-          <option value="">大区分（メディア種別）</option>
-          <option value="小説">小説</option>
-          <option value="漫画">漫画</option>
-          <option value="アニメ">アニメ</option>
-          <option value="映画">映画</option>
-          <option value="ドラマ">ドラマ</option>
-        </select>
-        <select v-model="ratingSelect">
-          <option value="">評価（★1〜5）</option>
-          <option value="1">★1</option>
-          <option value="2">★2</option>
-          <option value="3">★3</option>
-          <option value="4">★4</option>
-          <option value="5">★5</option>
-        </select>
-        <input v-model="thumbnailInput" type="text" placeholder="サムネイル画像URL">
-        <input v-model="memoInput" type="text" placeholder="メモ（詳細情報）">
-
-        <div id="tagInputArea">
-          <p>ジャンル（複数選択可）</p>
-          <div id="tagCheckboxes"></div>
-        </div>
-
-        <button @click="addWork">追加する</button>
-        <button @click="clearWorks">すべてクリア</button>
-      </div>
-
-      <h2>作品検索（TMDb / AniList）</h2>
-      <div>
-        <input v-model="titleSearchInput" type="text" placeholder="作品タイトルを検索">
-        <button @click="searchWorks">候補を検索</button>
-        <div id="searchResults"></div>
-      </div>
+      <WorkInput
+        :subcategories="subcategories"
+        :categories="categories"
+        :years="years"
+        @add-work="handleAddWork"
+      />
 
       <h2>メディア種別フィルター</h2>
       <div id="categoryFilterArea"></div>
