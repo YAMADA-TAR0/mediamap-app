@@ -1,0 +1,23 @@
+{
+  "name": "mediamap-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YAMADA-TAR0/mediamap-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YAMADA-TAR0/mediamap-app/issues"
+  },
+  "homepage": "https://github.com/YAMADA-TAR0/mediamap-app#readme",
+  "description": "",
+  "volta": {
+    "node": "22.16.0"
+  }
+}
