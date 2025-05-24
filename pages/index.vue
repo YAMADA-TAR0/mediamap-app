@@ -18,6 +18,9 @@ import { useAuth } from '~/composables/useAuth'
 import WorkInput from '~/components/WorkInput.vue'
 import TagCountChart from '~/components/TagCountChart.vue'
 import TagRatingChart from '~/components/TagRatingChart.vue'
+import WorkTimeline from '~/components/WorkTimeline.vue'
+import TagFilter from '~/components/TagFilter.vue'
+import CategoryFilter from '~/components/CategoryFilter.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
@@ -76,7 +79,6 @@ const loadCloudData = async () => {
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       works.value = docSnap.data().works
-      renderTimeline()
     }
   } catch (error) {
     console.error('クラウド読み込みエラー:', error)
@@ -87,71 +89,6 @@ const loadCloudData = async () => {
 const handleAddWork = (work) => {
   works.value.push(work)
   saveCloudData()
-  renderTimeline()
-}
-
-// タイムライン表示
-const renderTimeline = () => {
-  const timeline = document.getElementById("timeline")
-  if (!timeline) return
-
-  timeline.innerHTML = ""
-  const table = document.createElement("table")
-
-  // ヘッダー行（年代）
-  const thead = document.createElement("thead")
-  const headerRow = document.createElement("tr")
-  headerRow.appendChild(document.createElement("th")) // 左上空セル
-  years.forEach(year => {
-    const th = document.createElement("th")
-    th.textContent = year
-    headerRow.appendChild(th)
-  })
-  thead.appendChild(headerRow)
-  table.appendChild(thead)
-
-  const tbody = document.createElement("tbody")
-
-  for (let r = 5; r >= 1; r--) {
-    const tr = document.createElement("tr")
-    const th = document.createElement("th")
-    th.textContent = `★${r}`
-    tr.appendChild(th)
-
-    years.forEach(year => {
-      const td = document.createElement("td")
-      const filteredWorks = works.value.filter(w => 
-        w.year === year && 
-        w.rating === r && 
-        selectedCategories.value.has(w.category) &&
-        w.tags.some(tag => selectedTags.value.has(tag))
-      )
-
-      filteredWorks.forEach(work => {
-        const div = document.createElement("div")
-        div.className = "work-item"
-        div.setAttribute("data-category", work.category)
-        div.textContent = work.title
-        div.onclick = () => openModal(work)
-        td.appendChild(div)
-      })
-
-      tr.appendChild(td)
-    })
-
-    tbody.appendChild(tr)
-  }
-
-  table.appendChild(tbody)
-  timeline.appendChild(table)
-
-  // タイムラインの初期化（panzoom）
-  if (!window.panzoomInstance) {
-    window.panzoomInstance = panzoom(timeline, {
-      bounds: true,
-      boundsPadding: 0.1
-    })
-  }
 }
 
 // モーダル関連
@@ -176,7 +113,6 @@ const saveMemo = async () => {
     works.value[workIndex].memo = memoEditArea.value
     works.value[workIndex].rating = parseInt(modalRatingSelect.value)
     await saveCloudData()
-    renderTimeline()
   }
 
   showModal.value = false
@@ -187,19 +123,7 @@ const deleteWork = async () => {
 
   works.value = works.value.filter(w => w.id !== selectedWorkId.value)
   await saveCloudData()
-  renderTimeline()
   showModal.value = false
-}
-
-// タグ管理
-const selectAllTags = () => {
-  subcategories.forEach(tag => selectedTags.value.add(tag))
-  renderTimeline()
-}
-
-const deselectAllTags = () => {
-  selectedTags.value.clear()
-  renderTimeline()
 }
 
 // データインポート/エクスポート
@@ -222,7 +146,6 @@ const uploadData = (event) => {
       try {
         const data = JSON.parse(e.target.result)
         works.value = data
-        renderTimeline()
       } catch (error) {
         console.error('データ読み込みエラー:', error)
       }
@@ -239,7 +162,6 @@ onMounted(() => {
       await loadCloudData()
     } else {
       works.value = []
-      renderTimeline()
     }
   })
 
@@ -258,7 +180,6 @@ onMounted(() => {
         } else {
           selectedTags.value.delete(tag)
         }
-        renderTimeline()
       }
       label.appendChild(cb)
       label.appendChild(document.createTextNode(tag))
@@ -281,16 +202,12 @@ onMounted(() => {
         } else {
           selectedCategories.value.delete(cat)
         }
-        renderTimeline()
       }
       label.appendChild(cb)
       label.appendChild(document.createTextNode(cat))
       categoryFilterArea.appendChild(label)
     })
   }
-
-  // 初期表示
-  renderTimeline()
 })
 </script>
 
@@ -316,7 +233,6 @@ onMounted(() => {
       <div id="userArea" v-if="isLoggedIn">
         <button @click="() => logout(auth, () => {
           works.value = []
-          renderTimeline()
         })">ログアウト</button>
         <p id="userInfo">{{ currentUser?.displayName }} でログイン中</p>
       </div>
@@ -328,18 +244,24 @@ onMounted(() => {
         @add-work="handleAddWork"
       />
 
-      <h2>メディア種別フィルター</h2>
-      <div id="categoryFilterArea"></div>
+      <CategoryFilter
+        :categories="categories"
+        v-model:selected-categories="selectedCategories"
+      />
 
-      <h2>ジャンル（タグ）フィルター</h2>
-      <div>
-        <button @click="selectAllTags">すべて選択</button>
-        <button @click="deselectAllTags">すべて解除</button>
-      </div>
-      <div id="tagFilterArea"></div>
+      <TagFilter
+        :subcategories="subcategories"
+        v-model:selected-tags="selectedTags"
+      />
 
       <h2>作品マップ（縦軸：評価 / 横軸：年代）</h2>
-      <div id="timeline"></div>
+      <WorkTimeline
+        :works="works"
+        :selected-tags="selectedTags"
+        :selected-categories="selectedCategories"
+        :years="years"
+        @open-modal="openModal"
+      />
 
       <h2>タグ別登録数グラフ</h2>
       <TagCountChart :works="works" />
