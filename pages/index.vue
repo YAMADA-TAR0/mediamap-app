@@ -9,6 +9,7 @@ import WorkTimeline from '~/components/WorkTimeline.vue'
 import TagFilter from '~/components/TagFilter.vue'
 import CategoryFilter from '~/components/CategoryFilter.vue'
 import MainVisual from '~/components/MainVisual.vue'
+import WorkModal from '~/components/WorkModal.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth } = $firebase
@@ -17,11 +18,7 @@ const { works, createWork, readWorks, updateWork, deleteWork } = useWork($fireba
 
 // 状態管理
 const showModal = ref(false)
-const modalTitle = ref('')
-const modalInfo = ref('')
-const modalRatingSelect = ref('')
-const memoEditArea = ref('')
-const selectedWorkId = ref(null)
+const selectedWork = ref(null)
 const selectedTags = ref(new Set())
 const selectedCategories = ref(new Set())
 
@@ -51,33 +48,25 @@ const handleAddWork = async (work) => {
 
 // モーダル関連
 const openModal = (work) => {
-  modalTitle.value = work.title
-  modalInfo.value = `${work.category} / ${work.year}年`
-  modalRatingSelect.value = work.rating.toString()
-  memoEditArea.value = work.memo
-  selectedWorkId.value = work.id
+  selectedWork.value = work
   showModal.value = true
 }
 
-const closeModal = () => {
-  showModal.value = false
-}
+const handleModalSave = async (data) => {
+  if (!selectedWork.value) return
 
-const saveMemo = async () => {
-  if (!selectedWorkId.value) return
-
-  await updateWork(selectedWorkId.value, {
-    memo: memoEditArea.value,
-    rating: parseInt(modalRatingSelect.value)
+  await updateWork(selectedWork.value.id, {
+    memo: data.memo,
+    rating: data.rating
   })
 
   showModal.value = false
 }
 
-const handleDeleteWork = async () => {
-  if (!selectedWorkId.value) return
+const handleModalDelete = async () => {
+  if (!selectedWork.value) return
 
-  await deleteWork(selectedWorkId.value)
+  await deleteWork(selectedWork.value.id)
   showModal.value = false
 }
 
@@ -182,25 +171,12 @@ onMounted(() => {
       <button @click="downloadData">データをダウンロード</button>
       <input type="file" accept=".json" @change="uploadData">
 
-      <div id="modal" v-if="showModal">
-        <div class="modal-content">
-          <h2>{{ modalTitle }}</h2>
-          <p>{{ modalInfo }}</p>
-          <label for="modalRatingSelect">評価（★1〜5）</label>
-          <select v-model="modalRatingSelect">
-            <option value="1">★1</option>
-            <option value="2">★2</option>
-            <option value="3">★3</option>
-            <option value="4">★4</option>
-            <option value="5">★5</option>
-          </select>
-          <textarea v-model="memoEditArea"></textarea>
-          <br>
-          <button @click="saveMemo">保存</button>
-          <button @click="handleDeleteWork">この作品を削除</button>
-          <button @click="closeModal">キャンセル</button>
-        </div>
-      </div>
+      <WorkModal
+        v-model="showModal"
+        :work="selectedWork"
+        @save="handleModalSave"
+        @delete="handleModalDelete"
+      />
     </main>
   </div>
 </template>
