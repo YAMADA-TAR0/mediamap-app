@@ -17,6 +17,7 @@ import panzoom from '@panzoom/panzoom'
 import { useAuth } from '~/composables/useAuth'
 import WorkInput from '~/components/WorkInput.vue'
 import TagCountChart from '~/components/TagCountChart.vue'
+import TagRatingChart from '~/components/TagRatingChart.vue'
 
 const { $firebase } = useNuxtApp()
 const { auth, firestore } = $firebase
@@ -43,7 +44,6 @@ const memoEditArea = ref('')
 const selectedWorkId = ref(null)
 const selectedTags = ref(new Set())
 const selectedCategories = ref(new Set())
-const tagRatingChart = ref(null)
 
 // 定数
 const subcategories = [
@@ -77,7 +77,6 @@ const loadCloudData = async () => {
     if (docSnap.exists()) {
       works.value = docSnap.data().works
       renderTimeline()
-      renderTagRatingChart()
     }
   } catch (error) {
     console.error('クラウド読み込みエラー:', error)
@@ -89,7 +88,6 @@ const handleAddWork = (work) => {
   works.value.push(work)
   saveCloudData()
   renderTimeline()
-  renderTagRatingChart()
 }
 
 // タイムライン表示
@@ -156,50 +154,6 @@ const renderTimeline = () => {
   }
 }
 
-// グラフ表示
-const renderTagRatingChart = () => {
-  const ctx = document.getElementById('tagRatingChart')
-  if (!ctx) return
-
-  // 既存のグラフを破棄
-  if (tagRatingChart.value) {
-    tagRatingChart.value.destroy()
-  }
-
-  const tagRatings = {}
-  works.value.forEach(work => {
-    work.tags.forEach(tag => {
-      if (!tagRatings[tag]) {
-        tagRatings[tag] = { sum: 0, count: 0 }
-      }
-      tagRatings[tag].sum += work.rating
-      tagRatings[tag].count++
-    })
-  })
-
-  const averages = {}
-  Object.keys(tagRatings).forEach(tag => {
-    averages[tag] = tagRatings[tag].sum / tagRatings[tag].count
-  })
-
-  tagRatingChart.value = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: Object.keys(averages),
-      datasets: [{
-        label: 'タグ別平均評価',
-        data: Object.values(averages),
-        borderColor: 'rgba(255, 99, 132, 1)',
-        tension: 0.1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  })
-}
-
 // モーダル関連
 const openModal = (work) => {
   modalTitle.value = work.title
@@ -223,7 +177,6 @@ const saveMemo = async () => {
     works.value[workIndex].rating = parseInt(modalRatingSelect.value)
     await saveCloudData()
     renderTimeline()
-    renderTagRatingChart()
   }
 
   showModal.value = false
@@ -235,7 +188,6 @@ const deleteWork = async () => {
   works.value = works.value.filter(w => w.id !== selectedWorkId.value)
   await saveCloudData()
   renderTimeline()
-  renderTagRatingChart()
   showModal.value = false
 }
 
@@ -271,7 +223,6 @@ const uploadData = (event) => {
         const data = JSON.parse(e.target.result)
         works.value = data
         renderTimeline()
-        renderTagRatingChart()
       } catch (error) {
         console.error('データ読み込みエラー:', error)
       }
@@ -289,7 +240,6 @@ onMounted(() => {
     } else {
       works.value = []
       renderTimeline()
-      renderTagRatingChart()
     }
   })
 
@@ -341,7 +291,6 @@ onMounted(() => {
 
   // 初期表示
   renderTimeline()
-  renderTagRatingChart()
 })
 </script>
 
@@ -368,7 +317,6 @@ onMounted(() => {
         <button @click="() => logout(auth, () => {
           works.value = []
           renderTimeline()
-          renderTagRatingChart()
         })">ログアウト</button>
         <p id="userInfo">{{ currentUser?.displayName }} でログイン中</p>
       </div>
@@ -397,7 +345,7 @@ onMounted(() => {
       <TagCountChart :works="works" />
 
       <h2>タグ × 評価の傾向グラフ</h2>
-      <canvas id="tagRatingChart" width="600" height="300"></canvas>
+      <TagRatingChart :works="works" />
 
       <h2>データ管理</h2>
       <button @click="downloadData">データをダウンロード</button>
