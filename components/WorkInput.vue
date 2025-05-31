@@ -366,7 +366,7 @@ const selectSearchResult = (result) => {
           :key="result.title"
           class="search-result-item"
         >
-          <img :src="result.thumbnail" :alt="result.title" @error="$event.target.src='/img/no-image.png'">
+          <img :src="result.thumbnail" :alt="result.title">
           <span>{{ result.title }}</span>
           <span>{{ result.category }} / {{ result.year }}年</span>
           <span>{{ result.tags.join(', ') }}</span>
