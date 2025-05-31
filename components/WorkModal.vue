@@ -49,6 +49,9 @@ const handleDelete = () => {
     <div class="modal-content">
       <h2>{{ work.title }}</h2>
       <p>{{ work.category }} / {{ work.year }}年</p>
+      <p v-if="work.subcategory">ジャンル: {{ work.subcategory }}</p>
+      <p v-if="work.tags && work.tags.length">タグ: {{ work.tags.join(', ') }}</p>
+
       
       <div class="form-group">
         <label for="modalRatingSelect">評価（★1〜5）</label>
