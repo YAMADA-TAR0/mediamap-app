@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"explorer.excludeGitIgnore": true,
+		"files.exclude": {
+			"app.vue": true,
+			"original": true,
+			"server": true,
+			"tsconfig.json": true
+		}
+	}
+}
