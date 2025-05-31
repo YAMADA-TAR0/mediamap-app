@@ -10,6 +10,8 @@
 			"app.vue": true,
 			"original": true,
 			"server": true,
+			".github": true,
+			"main.code-workspace": true,
 			"tsconfig.json": true
 		}
 	}
