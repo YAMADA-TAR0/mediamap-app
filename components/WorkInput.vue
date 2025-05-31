@@ -241,16 +241,10 @@ const searchWorks = async () => {
             'Martial Arts': 'バトル・アクション',
             'Military': 'ヒューマンドラマ',
             'Police': 'サスペンス',
-            'Psychological': 'サスペンス',
             'Seinen': 'ヒューマンドラマ',
             'Shoujo Ai': '恋愛・ラブコメ',
             'Shounen Ai': '恋愛・ラブコメ',
             'Space': 'SF',
-            'Sports': '青春',
-            'Super Power': 'ファンタジー',
-            'Vampire': 'ホラー',
-            'Yaoi': '恋愛・ラブコメ',
-            'Yuri': '恋愛・ラブコメ'
           }
           return genreMap[genre] || 'その他'
         }).filter(tag => props.subcategories.includes(tag))
