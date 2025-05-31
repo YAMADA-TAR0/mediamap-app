@@ -88,7 +88,13 @@ onUnmounted(() => {
               :data-category="work.category"
               @click="emit('openModal', work, works.findIndex(w => w === work))"
             >
-              {{ work.title }}
+              <img 
+                v-if="work.thumbnail" 
+                :src="work.thumbnail" 
+                :alt="work.title"
+                class="work-thumbnail"
+              />
+              <span class="work-title">{{ work.title }}</span>
             </div>
           </td>
         </tr>
@@ -136,9 +142,31 @@ onUnmounted(() => {
     border-radius: 4px;
     font-size: 12px;
     margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 
     &:hover {
       background-color: #c8e6c9;
+    }
+
+    .work-thumbnail {
+      width: 80px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .work-title {
+      font-size: 11px;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      max-width: 100%;
     }
 
     &[data-category="小説"] { color: #1f77b4; }
