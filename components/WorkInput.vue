@@ -1,12 +1,4 @@
-<script setup lang="ts">
-interface SearchResult {
-  title: string
-  year: string
-  category: string
-  thumbnail: string
-  tags: string[]
-}
-
+<script setup>
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -36,7 +28,7 @@ const thumbnailInput = ref('')
 const memoInput = ref('')
 const titleSearchInput = ref('')
 const selectedTags = ref(new Set())
-const searchResults = ref<SearchResult[]>([])  // 検索結果を保持するリアクティブな配列
+const searchResults = ref([])  // 検索結果を保持するリアクティブな配列
 
 // TMDb APIキー
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3"
@@ -135,7 +127,7 @@ const searchWorks = async () => {
     const aniListData = await aniListResponse.json()
 
     // 検索結果を整形
-    const results: SearchResult[] = []
+    const results = []
 
     // 映画の結果を追加
     movieData.results.forEach(movie => {
