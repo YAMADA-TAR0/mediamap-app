@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import panzoom from '@panzoom/panzoom'
 
 const props = defineProps({
@@ -56,17 +56,15 @@ const initPanzoom = () => {
   }
 }
 
-watch([() => props.works, () => props.selectedTags, () => props.selectedCategories], () => {
-  // データの変更時にpanzoomを再初期化
+onMounted(() => {
+  initPanzoom()
+})
+
+onUnmounted(() => {
   if (panzoomInstance) {
     panzoomInstance.destroy()
     panzoomInstance = null
   }
-  initPanzoom()
-}, { deep: true })
-
-onMounted(() => {
-  initPanzoom()
 })
 </script>
 
