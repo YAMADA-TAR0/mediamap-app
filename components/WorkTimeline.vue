@@ -23,24 +23,36 @@ const props = defineProps({
 
 const emit = defineEmits(['openModal'])
 
-const timeline = ref(null)
+const timelineContainer = ref(null)
+const zoomTarget = ref(null)
 let panzoomInstance = null
 
 const getFilteredWorks = (year, rating) => {
   return props.works.filter(w => 
-    w.year === String(year) && 
-    w.rating === rating && 
+    Number(w.year) === Number(year) && 
+    Number(w.rating) === Number(rating) && 
     props.selectedCategories.has(w.category) &&
     w.tags.some(tag => props.selectedTags.has(tag))
   )
 }
 
 const initPanzoom = () => {
-  if (!panzoomInstance && timeline.value) {
-    panzoomInstance = panzoom(timeline.value, {
-      bounds: true,
-      boundsPadding: 0.1
+  if (!panzoomInstance && timelineContainer.value) {
+    panzoomInstance = panzoom(zoomTarget.value, {
+      maxScale: 5,
+      minScale: 0.1,
+      contain: 'outside'
     })
+
+    const zoomWithWheel = (e) => panzoomInstance.zoomWithWheel(e);
+    
+    timelineContainer.value.addEventListener("mouseenter", () => {
+      timelineContainer.value.addEventListener("wheel", zoomWithWheel);
+    });
+    
+    timelineContainer.value.addEventListener("mouseleave", () => {
+      timelineContainer.value.removeEventListener("wheel", zoomWithWheel);
+    });
   }
 }
 
@@ -59,8 +71,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="timeline" class="timeline-container">
-    <table>
+  <div ref="timelineContainer" class="timeline-container">
+    <table ref="zoomTarget">
       <thead>
         <tr>
           <th></th>
