@@ -5,7 +5,6 @@ import type { Firestore } from 'firebase/firestore'
 import { useCloudData } from './useCloudData'
 
 export interface Work {
-  id?: string
   title: string
   year: string
   category: string
@@ -30,17 +29,18 @@ export const useWork = (firestore: Firestore, currentUser: Ref<User | null>) => 
     return loadedWorks
   }
 
-  const updateWork = async (workId: string, updatedWork: Partial<Work>): Promise<void> => {
-    const index = works.value.findIndex(w => w.id === workId)
-    if (index !== -1) {
+  const updateWork = async (index: number, updatedWork: Partial<Work>): Promise<void> => {
+    if (index >= 0 && index < works.value.length) {
       works.value[index] = { ...works.value[index], ...updatedWork }
       await saveCloudData(works.value)
     }
   }
 
-  const deleteWork = async (workId: string): Promise<void> => {
-    works.value = works.value.filter(w => w.id !== workId)
-    await saveCloudData(works.value)
+  const deleteWork = async (index: number): Promise<void> => {
+    if (index >= 0 && index < works.value.length) {
+      works.value.splice(index, 1)
+      await saveCloudData(works.value)
+    }
   }
 
   return {

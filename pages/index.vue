@@ -21,6 +21,7 @@ const { downloadData, uploadData } = useWorkDataImportExport(createWork)
 // 状態管理
 const showModal = ref(false)
 const selectedWork = ref(null)
+const selectedWorkIndex = ref(-1)
 const selectedTags = ref(new Set())
 const selectedCategories = ref(new Set())
 
@@ -49,15 +50,16 @@ const handleAddWork = async (work) => {
 }
 
 // モーダル関連
-const openModal = (work) => {
+const openModal = (work, index) => {
   selectedWork.value = work
+  selectedWorkIndex.value = index
   showModal.value = true
 }
 
 const handleModalSave = async (data) => {
-  if (!selectedWork.value) return
+  if (selectedWorkIndex.value === -1) return
 
-  await updateWork(selectedWork.value.id, {
+  await updateWork(selectedWorkIndex.value, {
     memo: data.memo,
     rating: data.rating
   })
@@ -65,10 +67,10 @@ const handleModalSave = async (data) => {
   showModal.value = false
 }
 
-const handleModalDelete = async () => {
-  if (!selectedWork.value) return
+const handleModalDelete = async (index) => {
+  if (index === -1) return
 
-  await deleteWork(selectedWork.value.id)
+  await deleteWork(index)
   showModal.value = false
 }
 
@@ -146,6 +148,7 @@ onMounted(() => {
       <WorkModal
         v-model="showModal"
         :work="selectedWork"
+        :work-index="selectedWorkIndex"
         @save="handleModalSave"
         @delete="handleModalDelete"
       />

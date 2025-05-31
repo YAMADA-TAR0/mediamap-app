@@ -85,10 +85,10 @@ onMounted(() => {
           <td v-for="year in years" :key="year">
             <div
               v-for="work in getFilteredWorks(year, rating)"
-              :key="work.id || work.title"
+              :key="work.title"
               class="work-item"
               :data-category="work.category"
-              @click="emit('openModal', work)"
+              @click="emit('openModal', work, works.findIndex(w => w === work))"
             >
               {{ work.title }}
             </div>

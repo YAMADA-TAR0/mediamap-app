@@ -7,6 +7,10 @@ const props = defineProps({
   work: {
     type: Object,
     default: null
+  },
+  workIndex: {
+    type: Number,
+    required: true
   }
 })
 
@@ -29,13 +33,14 @@ const closeModal = () => {
 
 const handleSave = () => {
   emit('save', {
+    index: props.workIndex,
     rating: parseInt(localRating.value),
     memo: localMemo.value
   })
 }
 
 const handleDelete = () => {
-  emit('delete')
+  emit('delete', props.workIndex)
 }
 </script>
 
