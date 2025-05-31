@@ -1,4 +1,12 @@
-<script setup>
+<script setup lang="ts">
+interface SearchResult {
+  title: string
+  year: string
+  category: string
+  thumbnail: string
+  tags: string[]
+}
+
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -28,7 +36,7 @@ const thumbnailInput = ref('')
 const memoInput = ref('')
 const titleSearchInput = ref('')
 const selectedTags = ref(new Set())
-const searchResults = ref([])  // 検索結果を保持するリアクティブな配列
+const searchResults = ref<SearchResult[]>([])  // 検索結果を保持するリアクティブな配列
 
 // TMDb APIキー
 const TMDB_API_KEY = "228d640ff08a8b0c878af7963277edd3"
@@ -94,18 +102,18 @@ const searchWorks = async () => {
     // AniList APIでアニメを検索
     const aniListQuery = `
       query ($search: String) {
-        Page {
-          media(search: $search, type: ANIME) {
+        Page(perPage: 30) {
+          media(search: $search, type: MANGA) {
             id
             title {
               romaji
               native
             }
+            coverImage {
+              medium
+            }
             startDate {
               year
-            }
-            coverImage {
-              large
             }
             genres
           }
@@ -130,7 +138,7 @@ const searchWorks = async () => {
     const results = []
 
     // 映画の結果を追加
-    movieData.results.slice(0, 5).forEach(movie => {
+    movieData.results.forEach(movie => {
       results.push({
         title: movie.title,
         year: movie.release_date?.split('-')[0] || '不明',
@@ -164,7 +172,7 @@ const searchWorks = async () => {
     })
 
     // ドラマの結果を追加
-    tvData.results.slice(0, 5).forEach(tv => {
+    tvData.results.forEach(tv => {
       results.push({
         title: tv.name,
         year: tv.first_air_date?.split('-')[0] || '不明',
@@ -194,12 +202,12 @@ const searchWorks = async () => {
     })
 
     // アニメの結果を追加
-    aniListData.data.Page.media.slice(0, 5).forEach(anime => {
+    aniListData.data.Page.media.forEach(anime => {
       results.push({
-        title: anime.title.romaji,
+        title: anime.title.native,
         year: anime.startDate.year || '不明',
-        category: 'アニメ',
-        thumbnail: anime.coverImage.large,
+        category: '漫画',
+        thumbnail: anime.coverImage.medium,
         tags: anime.genres.map(genre => {
           const genreMap = {
             'Action': 'バトル・アクション',
