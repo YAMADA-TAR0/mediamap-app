@@ -91,9 +91,6 @@ onMounted(() => {
 .timeline-container {
   overflow: auto;
   width: 100%;
-  height: 1200px;
-  border: 1px solid #aaa;
-  background: #f9f9f9;
   position: relative;
   margin: 20px 0;
 }
