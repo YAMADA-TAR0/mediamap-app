@@ -135,7 +135,7 @@ const searchWorks = async () => {
     const aniListData = await aniListResponse.json()
 
     // 検索結果を整形
-    const results = []
+    const results: SearchResult[] = []
 
     // 映画の結果を追加
     movieData.results.forEach(movie => {
@@ -255,6 +255,37 @@ const searchWorks = async () => {
           return genreMap[genre] || 'その他'
         }).filter(tag => props.subcategories.includes(tag))
       })
+    })
+
+    // 検索結果をソート
+    results.sort((a, b) => {
+      const searchTerm = titleSearchInput.value.toLowerCase()
+      const titleA = a.title.toLowerCase()
+      const titleB = b.title.toLowerCase()
+
+      // 完全一致の判定
+      const exactMatchA = titleA === searchTerm
+      const exactMatchB = titleB === searchTerm
+      if (exactMatchA !== exactMatchB) {
+        return exactMatchA ? -1 : 1
+      }
+
+      // 前方一致の判定
+      const startsWithA = titleA.startsWith(searchTerm)
+      const startsWithB = titleB.startsWith(searchTerm)
+      if (startsWithA !== startsWithB) {
+        return startsWithA ? -1 : 1
+      }
+
+      // 含むの判定
+      const includesA = titleA.includes(searchTerm)
+      const includesB = titleB.includes(searchTerm)
+      if (includesA !== includesB) {
+        return includesA ? -1 : 1
+      }
+
+      // それ以外は元の順序を維持
+      return 0
     })
 
     // 検索結果をリアクティブな配列に設定
