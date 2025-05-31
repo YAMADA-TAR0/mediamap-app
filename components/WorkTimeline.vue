@@ -41,7 +41,6 @@ const initPanzoom = () => {
     panzoomInstance = panzoom(zoomTarget.value, {
       maxScale: 5,
       minScale: 0.1,
-      contain: 'outside'
     })
 
     const zoomWithWheel = (e) => panzoomInstance.zoomWithWheel(e);
